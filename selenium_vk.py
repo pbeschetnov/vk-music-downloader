@@ -6,6 +6,7 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from sys import stdout
 
 SCROLL_SCRIPT = 'window.scrollTo(0, document.body.scrollHeight);'
 DELAY = 0.1
@@ -58,10 +59,15 @@ class VKDownloader:
             os.makedirs(self.own_folder)
         os.chdir(self.own_folder)
         for url, name in self.friends:
+            print(end='\r')
+            print('Processing', name, end='')
+            stdout.flush()
             with open('{}.txt'.format(name), 'w') as output:
                 music = self.fetch_users_music(url)
                 print('\n'.join('{} - {}'.format(performer, title) for performer, title in music),
                       file=output)
+        print(end='\r')
+        print('Finished!')
 
     def fetch_users_music(self, url):
         self.driver.get(url)

@@ -119,9 +119,6 @@ class VKAuth(object):
             # now get _access_token and _user_id
             self._get_params()
 
-            # close current session
-            self._close()
-
     def get_token(self):
         """
             @return value:
@@ -247,7 +244,7 @@ class VKAuth(object):
             print('Couldn\'t fetch token and user id\n')
             print(err)
 
-    def _close(self):
+    def close(self):
         self.session.close()
         self.response = None
         self.form_parser = None

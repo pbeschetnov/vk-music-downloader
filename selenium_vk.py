@@ -1,17 +1,15 @@
 import os
 import time
-
+from config import VK_URL, VK_FRIENDS, SAVE_FOLDER
+from getpass import getpass
+from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
-from config import VK_URL, VK_FRIENDS, SAVE_FOLDER
-from getpass import getpass
-from selenium import webdriver
-
 SCROLL_SCRIPT = 'window.scrollTo(0, document.body.scrollHeight);'
 DELAY = 0.1
-MAX_NO_CHANGES = 10
+MAX_NO_CHANGES = 20
 
 
 class VKDownloader:

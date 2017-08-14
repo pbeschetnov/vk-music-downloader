@@ -20,29 +20,33 @@ class VKDownloader:
         self.own_folder = 'Guest'
 
     def login(self):
-        self.driver.get(VK_URL)
-        while not self.email_phone:
-            self.email_phone = input('Enter email or phone: ').strip()
+        while True:
+            self.driver.get(VK_URL)
+            while not self.email_phone:
+                self.email_phone = input('Enter email or phone: ').strip()
 
-        while not self.password:
-            self.password = getpass('Enter password: ')
+            while not self.password:
+                self.password = getpass('Enter password: ')
 
-        email_element = self.driver.find_element_by_css_selector('input[name="email"]')
-        pass_element = self.driver.find_element_by_css_selector('input[name="pass"]')
+            email_element = self.driver.find_element_by_css_selector('input[name="email"]')
+            pass_element = self.driver.find_element_by_css_selector('input[name="pass"]')
 
-        email_element.send_keys(self.email_phone)
-        pass_element.send_keys(self.password)
+            email_element.send_keys(self.email_phone)
+            pass_element.send_keys(self.password)
 
-        login_button = self.driver.find_element_by_css_selector('input[type="submit"]')
-        login_button.click()
+            login_button = self.driver.find_element_by_css_selector('input[type="submit"]')
+            login_button.click()
 
-        try:
-            profile_block = WebDriverWait(self.driver, 10) \
-                .until(EC.presence_of_element_located((By.CLASS_NAME, 'op_owner')))
-            name = profile_block.get_attribute('data-name')
-            self.own_folder = os.path.join(SAVE_FOLDER, name)
-        finally:
-            pass
+            try:
+                profile_block = WebDriverWait(self.driver, 2) \
+                    .until(EC.presence_of_element_located((By.CLASS_NAME, 'op_owner')))
+                name = profile_block.get_attribute('data-name')
+                self.own_folder = os.path.join(SAVE_FOLDER, name)
+                break
+            except:
+                print('Wrong email (phone) of password')
+                self.email_phone = None
+                self.password = None
 
     def get_friends(self):
         offset = 0

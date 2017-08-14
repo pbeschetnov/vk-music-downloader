@@ -11,6 +11,12 @@ AUDIO_REQUEST = VK_URL + '/audio?id={user_id}&offset={offset}'
 FRIENDS_REQUEST = VK_URL + '/friends?offset={offset}'
 
 
+def erase_print(*args):
+    print(end='\r')
+    print(*args, end='')
+    stdout.flush()
+
+
 class VKDownloader:
     def __init__(self, email_phone=None, password=None):
         self.driver = webdriver.PhantomJS()
@@ -63,27 +69,30 @@ class VKDownloader:
         if not os.path.exists(self.own_folder):
             os.makedirs(self.own_folder)
         os.chdir(self.own_folder)
-        for url, name in self.friends:
-            print(end='\r')
-            print('Processing', name, end='')
-            stdout.flush()
+        for i, (url, name) in enumerate(self.friends, start=1):
+            message = 'Processing {0}/{1} friend: {2}'.format(i, len(self.friends), name)
             with open('{}.txt'.format(name), 'w') as output:
-                music = self.fetch_users_music(url)
+                music = self.fetch_users_music(url, message)
                 print('\n'.join('{} - {}'.format(performer, title) for performer, title in music),
                       file=output)
-        print(end='\r')
-        print('Finished!')
+        erase_print('Finished!')
 
-    def fetch_users_music(self, url):
+    def fetch_users_music(self, url, message):
         self.driver.get(url)
         music = []
+        erase_print(message)
         try:
             audio_block = self.driver.find_element_by_css_selector('a.pm_item[href^="/audios"]')
             audio_url = audio_block.get_attribute('href')
             user_id = audio_url.split('audios')[-1]
             offset = 0
+            count = None
             while True:
                 self.driver.get(AUDIO_REQUEST.format(user_id=user_id, offset=offset))
+                if count is None:
+                    count_block = self.driver.find_element_by_class_name('audioPage__count')
+                    count = int(count_block.text.split()[0])
+                erase_print(message, '-', '{}%'.format(100 * offset // count))
                 audio_rows = self.driver.find_elements_by_css_selector('.audios_block .ai_label')
                 if len(audio_rows) == 0:
                     break
